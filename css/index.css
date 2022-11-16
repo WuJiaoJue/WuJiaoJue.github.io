@@ -6051,3 +6051,8 @@ blockquote.pullquote.right {
     max-height: 75vh !important;
   }
 }
+#article-container code {
+  color: rgba(149,165,166,0.8);
+  background-color: #f6f8fa;
+  border-radius: 4px;
+}
