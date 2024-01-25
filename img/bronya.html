@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>pswd</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <style>
+        #body-wrap,#content-inner {
+            display: flex;
+            box-sizing: border-box;
+            color: var(--font-color);
+            font-size: var(--global-font-size);
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Lato,Roboto,PingFang SC,Microsoft YaHei,sans-serif;
+            line-height: 2;
+            --global-font-size: 14px;
+            --font-color: #4c4948;
+            --card-bg: #fff;
+            --card-box-shadow: 0 3px 8px 6px rgba(7,17,27,0.05)
+        }
+
+        #content-inner {
+            margin: 0 auto;
+            padding: 20px 5px;
+            width: 100%;
+            max-width: 600px;
+            -webkit-box-flex: 1;
+            flex: 1 auto;
+            flex-direction: column;
+            animation: bottom-top 1s
+        }
+
+        #post {
+            padding: 36px 14px;
+            width: 100%!important;
+            border-radius: 8px;
+            background: var(--card-bg);
+            box-shadow: var(--card-box-shadow);
+            transition: all .3s;
+            align-self: flex-start
+        }
+
+        #article-container,#post {
+            box-sizing: border-box;
+            color: var(--font-color);
+            font-size: var(--global-font-size);
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Lato,Roboto,PingFang SC,Microsoft YaHei,sans-serif;
+            line-height: 2
+        }
+
+        #article-container {
+            overflow-wrap: break-word
+        }
+
+        #article-container>figure {
+            overflow: auto;
+            margin: 0 0 20px;
+            padding: 0;
+            background: var(--hl-bg);
+            color: var(--hl-color);
+            overflow-wrap: break-word;
+        }
+
+        #article-container>figure,#article-container>figure>div {
+            position: relative;
+            box-sizing: border-box;
+            font-size: var(--global-font-size);
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Lato,Roboto,PingFang SC,Microsoft YaHei,sans-serif;
+            line-height: 1.6;
+            --global-font-size: 14px;
+            --global-bg: #fff;
+            /*--hl-bg: #f6f8fa;*/
+            --hl-bg: #fff1d6;
+            /*--hltools-bg: #e6ebf1;*/
+            --hltools-bg: #ffd048;
+            /*--hltools-color: #90a4ae;*/
+            --hltools-color: #a67800;
+        }
+
+        #article-container>figure>div {
+            display: flex;
+            overflow: hidden;
+            height: 2.15em;
+            min-height: 24px;
+            background: var(--hltools-bg);
+            color: var(--hltools-color);
+            overflow-wrap: break-word;
+            -webkit-box-align: center;
+            align-items: center
+        }
+
+        #article-container>figure>div>i.fas.fa-angle-down.expand {
+            display: var(--fa-display,inline-block);
+            padding: .57em .7em;
+            font-weight: 900;
+            font-style: normal;
+            font-variant: normal;
+            font-size: var(--global-font-size);
+            font-family: Font Awesome\ 6 Free;
+            line-height: 1;
+            cursor: pointer;
+            transition: transform .3s;
+            -webkit-text-size-adjust: 100%;
+            --text-bg-hover: rgba(73,177,245,0.7);
+            --text-highlight-color: #1f2d3d;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: auto
+        }
+
+        #article-container>figure>div>div.code-lang,#article-container>figure>div>i.fas.fa-angle-down.expand {
+            position: absolute;
+            box-sizing: border-box;
+            color: var(--hltools-color);
+            overflow-wrap: break-word
+        }
+
+        #article-container>figure>div>div.code-lang {
+            left: 1.7em;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 1.15em;
+            -webkit-text-size-adjust: 100%;
+            --text-bg-hover: rgba(73,177,245,0.7);
+            --text-highlight-color: #1f2d3d;
+            user-select: none
+        }
+
+        #article-container>figure>div>div.code-lang,#article-container>figure>div>div.copy-notice {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Lato,Roboto,PingFang SC,Microsoft YaHei,sans-serif;
+            line-height: 1.6
+        }
+
+        #article-container>figure>div>div.copy-notice {
+            right: 2.4em;
+            opacity: 0;
+            transition: opacity .4s
+        }
+
+        #article-container>figure>div>div.copy-notice,#article-container>figure>div>i.fas.fa-paste.copy-button {
+            position: absolute;
+            box-sizing: border-box;
+            color: var(--hltools-color);
+            font-size: var(--global-font-size);
+            overflow-wrap: break-word
+        }
+
+        #article-container>figure>div>div.copy-notice,#article-container>figure>div>i.fas.fa-paste.copy-button:hover {
+            color: rgba(73,177,245,0.7);
+        }
+
+        #article-container>figure>div>i.fas.fa-paste.copy-button {
+            right: 14px;
+            display: var(--fa-display,inline-block);
+            font-weight: 900;
+            font-style: normal;
+            font-variant: normal;
+            font-family: Font Awesome\ 6 Free;
+            line-height: 1;
+            cursor: pointer;
+            transition: color .2s;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: auto
+        }
+
+        #article-container>figure>table {
+            display: block;
+            overflow: auto;
+            width: 100%;
+            border: none;
+            border-collapse: collapse;
+            overflow-wrap: break-word;
+            border-spacing: 0;
+
+        }
+
+        #article-container>figure>table,#article-container>figure>table>tbody {
+            box-sizing: border-box;
+            color: var(--hl-color);
+            empty-cells: show;
+            font-size: var(--global-font-size);
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Lato,Roboto,PingFang SC,Microsoft YaHei,sans-serif;
+            line-height: 1.6
+        }
+
+        #article-container>figure>table>tbody {
+            overflow-wrap: break-word
+        }
+
+        #article-container>figure>table>tbody,#article-container>figure>table>tbody>tr {
+            border-collapse: collapse;
+            border-spacing: 0
+        }
+
+        #article-container>figure>table>tbody>tr,#article-container>figure>table>tbody>tr>td.gutter {
+            box-sizing: border-box;
+            color: var(--hl-color);
+            empty-cells: show;
+            font-size: var(--global-font-size);
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Lato,Roboto,PingFang SC,Microsoft YaHei,sans-serif;
+            line-height: 1.6;
+            overflow-wrap: break-word
+        }
+
+        #article-container>figure>table>tbody>tr>td.gutter {
+            padding: 0;
+            border: none;
+            border-collapse: collapse;
+            vertical-align: middle;
+            border-spacing: 0;
+            user-select: none
+        }
+
+        #article-container>figure>table>tbody>tr>td.gutter>pre {
+            overflow: auto;
+            margin: 0;
+            padding: 8px 10px;
+            border: none;
+            border-collapse: collapse;
+            background: var(--hl-bg);
+            background-color: var(--hlnumber-bg);
+            overflow-wrap: break-word;
+            border-spacing: 0
+        }
+
+        #article-container>figure>table>tbody>tr>td.gutter>pre,#article-container>figure>table>tbody>tr>td.gutter>pre>span {
+            box-sizing: border-box;
+            color: var(--hlnumber-color);
+            empty-cells: show;
+            text-align: right;
+            font-size: var(--global-font-size);
+            font-family: consolas,Menlo,PingFang SC,Microsoft YaHei,sans-serif!important;
+            line-height: 1.6;
+            --hlnumber-color: rgba(144,164,174,0.5);
+            user-select: none
+        }
+
+        #article-container>figure>table>tbody>tr>td.gutter>pre>span {
+            border-collapse: collapse;
+            overflow-wrap: break-word;
+            border-spacing: 0
+        }
+
+        #article-container>figure>table>tbody>tr>td.gutter>pre>br {
+            border-collapse: collapse;
+            color: var(--hlnumber-color);
+            text-align: right;
+            font-family: consolas,Menlo,PingFang SC,Microsoft YaHei,sans-serif!important;
+            border-spacing: 0;
+            user-select: none
+        }
+
+        #article-container>figure>table>tbody>tr>td.code,#article-container>figure>table>tbody>tr>td.gutter>pre>br {
+            box-sizing: border-box;
+            empty-cells: show;
+            font-size: var(--global-font-size);
+            line-height: 1.6;
+            --hl-color: #90a4ae;
+            overflow-wrap: break-word
+        }
+
+        #article-container>figure>table>tbody>tr>td.code {
+            padding: 0;
+            border: none;
+            border-collapse: collapse;
+            color: var(--hl-color);
+            vertical-align: middle;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Lato,Roboto,PingFang SC,Microsoft YaHei,sans-serif;
+            border-spacing: 0;
+        }
+
+        /*#article-container > figure > table > tbody > tr > td > i{*/
+        /*    padding-left: 14px;*/
+        /*    cursor: pointer;*/
+        /*    transition: color .2s;*/
+        /*    -webkit-font-smoothing: antialiased;*/
+        /*    text-rendering: auto;*/
+        /*    color: var(--hltools-color);*/
+        /*    font-size: var(--global-font-size);*/
+        /*    overflow-wrap: break-word;*/
+        /*}*/
+
+        .rotate-90 {
+            transform: rotate(-90deg);
+        }
+
+        /* 设置对话框样式 */
+        input[type="text"] {
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+
+    <SCRIPT language=JavaScript>
+        function password() {
+            let testV = 1;
+            const imgtext =
+                '（ᗜ ‸ ᗜ）';
+            const salt = 'bronya';
+            let pass1 = prompt(imgtext,'');
+            const truepass = '45f9667b18c9e7e57f60f6ed9b75b8701f287008fc1a8d3ac4bf253ca81eb5d0'
+            let hasdedPass1;
+            while (testV <= 3) {
+                hasdedPass1 = CryptoJS.SHA256(pass1 + salt).toString()
+                if (!pass1)
+                    history.go(-1);
+                if (hasdedPass1 === truepass) {
+                    alert('（ᗜ ‸ ᗜ）');
+                    break;
+                }
+                testV += 1;
+                pass1 = prompt('（─ ‸ ─）');
+            }
+
+            if (hasdedPass1 !== truepass && testV ===4){
+                history.go(-1);
+                pass1 = prompt('（─ ‸ ─）');
+                while (true){
+                    prompt('（─ ‸ ─）');
+                }
+            }
+            window.pswd = pass1
+            return " ";
+        }
+        document.write(password());
+    </SCRIPT>
+
+    <script>
+        function copyClick(element) {
+            const noticeElement = element.parentNode.getElementsByClassName('copy-notice')[0];
+            const codeText = element.closest('figure').querySelector('.code .line').innerText;
+
+            const tempInput = document.createElement('textarea'); // 创建一个临时文本输入框
+            tempInput.value = codeText; // 将要复制的文本赋值给它
+            document.body.appendChild(tempInput); // 将它添加到DOM树中
+            tempInput.select(); // 选择文本
+            document.execCommand('copy'); // 复制文本
+            document.body.removeChild(tempInput); // 从DOM树中移除
+
+            noticeElement.style.opacity = '1'; // 显示复制成功提示
+            setTimeout(() => {
+                noticeElement.style.opacity = '0'; // 1秒后隐藏提示
+            }, 1000); // 延迟1000毫秒/1秒执行
+        }
+
+        function handleClick(element) {
+            const figureElement = element.parentNode.parentNode;
+            const tableElements = figureElement.getElementsByTagName('table');
+
+            if (tableElements[0].style.display === 'block') {
+                tableElements[0].style.display = 'none'
+                element.classList.toggle('rotate-90');
+            } else {
+                tableElements[0].style.display = 'block'
+                element.classList.toggle('rotate-90');
+            }
+        }
+    </script>
+
+</head>
+
+<body style="overflow: auto; color: #fff; user-select: none;">
+    <div class="post" id="body-wrap">
+        <main class="layout" id="content-inner">
+            <div id="post">
+                <article class="post-content" id="article-container">
+
+<!--                    <figure class="highlight shell">-->
+<!--                        <div class="highlight-tools " >-->
+<!--                            <i class="fas fa-angle-down expand" onclick="handleClick(this)"></i>-->
+<!--                            <div class="code-lang">TapTap元气骑士</div>-->
+<!--                            <div class="copy-notice">复制成功</div>-->
+<!--                            <i class="fas fa-paste copy-button" onclick="copyClick(this)"></i>-->
+<!--                        </div>-->
+<!--                        <table style="display: none;">-->
+<!--                            <tbody>-->
+<!--                            <tr>-->
+<!--                                <td class="gutter">-->
+<!--                                    <pre><span class="line">TapTap元气骑士</span><br></pre>-->
+<!--                                </td>-->
+<!--                                <td class="code">-->
+<!--                                    <pre><span class="line">Include<></span><br></pre>-->
+<!--                                </td>-->
+<!--                            </tr>-->
+<!--                            </tbody>-->
+<!--                        </table>-->
+<!--                    </figure>-->
+
+                </article>
+            </div>
+        </main>
+    </div>
+</body>
+
+<script>
+    let encryptedPswdData = [
+        // 1
+        {appname:'U2FsdGVkX18mH1QqaA3kH5sHBNj6nyW0XXhxJ/981hk=', username:'U2FsdGVkX1+NSiFMDm2Jt3VXYQql7xeBQtrd26RkXS8=', password:'U2FsdGVkX19HMGhOwaPriAKQV7WOfQAVKP+fEOKPcFY='},
+        // A
+        {appname:'U2FsdGVkX1/H6TRQf6slbjOdvGxADqk0fckkKW5vgIs=', username:'U2FsdGVkX1/9Hv9GF65zzuiSslo5pdqdvS05TgapHdc=', password:'U2FsdGVkX1+Fnp3rM1XR85Hdk2NVpS3MJ9AsR+uz0Us='},
+        {appname:'U2FsdGVkX19tjxCub2oILgxObtYWnnLhXdBFedxKuPg=', username:'U2FsdGVkX1/MSwHp6EQAw4PTPffrDBGhU9gwAqRYfqRL0A+Wflg9MRvqTqR9pFIA', password:'U2FsdGVkX19SSfmb/EBpqD0UrRJX96m+KIYEnaa3WsM='},
+        {appname:'U2FsdGVkX1/l5oVzzz7sUQLt/5vn3CWx01m8Fzn1nPs=', username:'U2FsdGVkX19B3epqIr+lWPQjOQhTJZ8f/OXxw/PCG1I=', password:'U2FsdGVkX1+46BbwHJE0y2JZCu4i44rmnVquKM9b2+0='},
+        {appname:'U2FsdGVkX1+ljq0kH5EY7zNrVh4rJwTuNFNB6/5YnYk=', username:'U2FsdGVkX18V+Zklg7TE4mLdy/e0Z4Fd1LzNT976+3A=', password:'U2FsdGVkX1+KkXXMi5qSjVOxXw4ih/hsQUgHS4xq75E='},
+        {appname:'U2FsdGVkX1+LE3hGsNTwkleO13LEv/59VW/CxY3ogzk=', username:'U2FsdGVkX1+FZxOCM52tBSmiGY4S8cuyjKfYlEVU5jo=', password:'U2FsdGVkX1+lvP8dU5hmI7eZoZ4NoEsk8xKRhVzAsUE='},
+        // B
+        {appname:'U2FsdGVkX1+SwSw9xjWwyJ8eEoxG5BMSkA8IaRm6hUs=', username:'U2FsdGVkX19eKja0O2kMdQOOXuDy3QktqncHNjD8Xks=', password:'U2FsdGVkX1/FJZ6GmXOulHhl+u3NPJNVXgXZ0Wqa3NA='},
+        {appname:'U2FsdGVkX1+jMVGrAqszcOVJ8pdDcKzbCSmD1mVThM4=', username:'U2FsdGVkX18Iy/m+wN7acTKASrWiIbal4m3o1+GoMHQ=', password:'U2FsdGVkX18qgtrlx86MVY/lEdk/GwBhZLag1/oR3uc='},
+        {appname:'U2FsdGVkX1+1EVLt5TMw/v8C1OsNNeu3MAHUyLSQpR4=', username:'U2FsdGVkX1+MAh4Yyplg3gpcenDYyejoAibaPg8ddV8=', password:'U2FsdGVkX1+dCEqlI7LGUjCqgrkBExxA2WBnfsCL14s='},
+        {appname:'U2FsdGVkX1+bNo9tK2McrT6nROFNQu/hSQGrA0/puPQ=', username:'U2FsdGVkX18c2ZTrGFGd2svRAmSaiV55flkGEeSeuUg=', password:'U2FsdGVkX1+KAqmN1WGkNCF0fIUWIM4aAsTKnIS9gzg='},
+        {appname:'U2FsdGVkX19ZxHGTRfsxdOODEUKZqa4tzpi/Cj0Q1fM=', username:'U2FsdGVkX1+hfJDiygch94bQXQBMe7fatoooTPJG/e4=', password:'U2FsdGVkX19YzFrxxUImHoSzWMgsN2Xlt0qXDveX9UI='},
+        {appname:'U2FsdGVkX1+HBjqUgYsc26TvwFtpDcQAKySIpoFZVwA=', username:'U2FsdGVkX19sQW95/eu1ysBcbAeIjyFp1Loj9JrmhHY=', password:'U2FsdGVkX1+3AuoBTfCxu9h2yw8TMQjtXYDYYR5N+H8='},
+        {appname:'U2FsdGVkX1/wtUySXavuxXSS/D8nPk7WfURd5dyLJyG1xYbCNek2qIyoJCbe6eVceHzkCjKwqRU3J7521CRZqA==', username:'U2FsdGVkX181y/aYJBY7bqv4EnPjNQjOy5Akn8KE/oQ=', password:'U2FsdGVkX197fgoVwStR5PqkIMRbSjGbH21g+4+ZtCs='},
+        // C
+        {appname:'U2FsdGVkX1+HnNejyhhZm4kSm3PztOJdjaAl/ojjRoI=', username:'U2FsdGVkX1810oQajesA5NlZ0sxQtyw+9IYs1kaIgi7zjK86Ti+FwqtADT5PtEtn', password:'U2FsdGVkX1/0mSlZiuRdIlDTZyTAsD+gG8+2eLr0S/Q='},
+        {appname:'U2FsdGVkX1/+4Msd4u9yzufYoZKAZAV7J3Id0RtOEVE=', username:'U2FsdGVkX1/aZwgHbSboHTvkLwyAJj1EHxw5zKBFSno=', password:'U2FsdGVkX1+AAzsk+9elLkFH96jQ1xo/g3I2Ke1zdvc='},
+        // D
+        {appname:'U2FsdGVkX1/LFTp79kHiTFmHNiF2VvQRD8Zfkpn/6W4=', username:'U2FsdGVkX19/bOqStZAOq5eqTLRiFUmq9SCzcHzD0aTMrEzWTofGPz73xqh+cdwn', password:'U2FsdGVkX1/nfDXY/6jCBPuAz6efFlclqZGqEH1XX4k='},
+        {appname:'U2FsdGVkX18ftgGn/ETVqfHMM9syl1iAWvtmaFENqGo=', username:'U2FsdGVkX1+1yFejk58UcrfLnhJq4GkPPXKNSLHrxDI=', password:'U2FsdGVkX18ym9FuIvvLS7JhKNz8Fbb9DT4sOstU39o='},
+        // E
+        {appname:'U2FsdGVkX1/WbXrFaHUKvBHLBo4kcxwGahiBfKpY2MQ=', username:'U2FsdGVkX1+JjgfBrebb7L66zcP/xTlBPzvXJ/aYerspspHyU285f+BQgFsUbwn6', password:'U2FsdGVkX1+NELM68k2L8r/ibLBoz326KPkYz0uA7gM='},
+        {appname:'U2FsdGVkX19kKIgnRQFxPVDcJ+bQ87QiUOFkGBa+HRA=', username:'U2FsdGVkX1/BijLrUhN7J7ch36arsFxQmQvrQlz9e7qkrGtp+p63cWuS/lGEFo+Z', password:'U2FsdGVkX19whuUOzJRe5iH+5Cg86FayE1DZfKPdIXM='},
+        {appname:'U2FsdGVkX1+KYbOALouERXJtYTaMcNhoTekVQCBSVgw/AllrqgOGGcq37JmtmKaK', username:'U2FsdGVkX1/moohwx2ZUKypSKZEXtvYuS9/IbmUb/cg=', password:'U2FsdGVkX19gpy43bglWsLPeWdd9IHnj7Ado/tgV4Hs='},
+        {appname:'U2FsdGVkX1+IjNKcgfNLrPxGL/Rnwb2bWzEETzLiwnQc/GIb5pbAYhldjd0C0fPk', username:'U2FsdGVkX1/IPNM6KKimra+SB0FFNkuH2E9AxiVrOnw=', password:'U2FsdGVkX19v5tVLjZRsSEv2Y9z1dZiICz/fkxTs9Es='},
+        // F
+        {appname:'U2FsdGVkX1+ceg7mJ8ve13qlfLv9PhqB7JSh1XU4mXA=', username:'U2FsdGVkX18WLG3JQcoaNj84BwfKRe84rTJx3OiYN4dsL4ELQgTnLjC1G7AlLO4P', password:'U2FsdGVkX1/rvjaYypK4+oQPJisbswF2FxgjmEBAIKI='},
+        // G
+        {appname:'U2FsdGVkX19axaprcxKF+gaT632USvD6dnYJ8bATvJ4=', username:'U2FsdGVkX19nikF9IxZ8e9/ezhUaU0VhL5WCIiaol05QXMkLThRm1vO5SJcgYcOn', password:'U2FsdGVkX18PYgML6w1tFdyx4WfoGE53+Oof21vx2Mo='},
+        // H
+        {appname:'U2FsdGVkX1/lquhgcDn5q3L8q8ZHtQJkmF6Q9hGiqRI=', username:'U2FsdGVkX18EgdDHyHBiIVqHpunftozOIctSkeFKIa3mSyH5z/Ik50VCou5vr6iv', password:'U2FsdGVkX19weHMsoJy81XKWyKo1YWS/bvosSNALEIQ='},
+        {appname:'U2FsdGVkX1/6Q5c0J54mhhLgBHU+rni+TJndTKtkpL0=', username:'U2FsdGVkX18YSxJKqYveezBMGTEvEm8NyOQvUFXMz3A=', password:'U2FsdGVkX1912pzIQP/JJADOFTvgYZH0FE/8OK3zyAY='},
+        {appname:'U2FsdGVkX19XG/H8aoUKHnGfMFWs82okfpwxB4znHy8=', username:'U2FsdGVkX1+XFCzaZSQT0IzTRWGFfNauNrdIXtZ5QCc=', password:'U2FsdGVkX19sP9Q3sH6apVGPwUxjWucmZV0TVSueqgw='},
+        // I
+        {appname:'U2FsdGVkX1+u4ot3t1RLRjH1O2VIitstO6r8wo3PyPs=', username:'U2FsdGVkX1+BK1ELBW13gu4/ZLmBrlRzipoGab8mKNw=', password:'U2FsdGVkX185Hwb4eRV4mDvaYoMgHzvuz6m/dTSk2uc='},
+        // J
+        {appname:'U2FsdGVkX18psriYq/GBwWIbRTejFL5kspPGD6h3nS0=', username:'U2FsdGVkX19tWAgm1jqL0dLteMBXhiRW4hPoXS+62g1q7FJEBtcPquucsnfBtAHa', password:'U2FsdGVkX1/8yN4Rok9HTojiwSOffw+fkRLI34AOSCs='},
+        {appname:'U2FsdGVkX1+Z1XKTSRKOCW1BQ7gWQC9n3dc3yPevXks2A1xskwKllwaqXRQ8NJVw', username:'U2FsdGVkX18sjJSe5g7bdsYfVNjQBtMDS7q8AUbFwJI=', password:'U2FsdGVkX1/um/hQ3PJOoKiWbu2LL5sV/NLcbHtrby4='},
+        {appname:'U2FsdGVkX1/av6jvwBJhEy5AsaSSDT1sA1U+nqlZ050=', username:'U2FsdGVkX1+th6b/Dro1wwK7blOEHMLwVPFJER/hwRU=', password:'U2FsdGVkX193kQB5Y/oKrPx0QQgQOYfJuhbtNNPfdsI='},
+        {appname:'U2FsdGVkX18UU9LXIl8jSfhye3/r06ZdXP16PWiaMVG4sUbwfTbVd9KKT9rkI76L', username:'U2FsdGVkX18s1LowSGWI7RKk33Z2ua94tFwSvUPNBgQ=', password:'U2FsdGVkX18+s8TPPPJ9YAnELmN1x5TuMYSjpVprzHo='},
+        {appname:'U2FsdGVkX1/0adv5ztpru1os0XoDMrGFGtAkrTpgep0=', username:'U2FsdGVkX1/Wydow3JC7RUVSAOpguwFkl7CEngNTO7gqdE1/pwuy0z6zvHHXL/mR', password:'U2FsdGVkX1+K0pndTBIv4SMsItUBf/l+g19Y1HCTxyY='},
+        {appname:'U2FsdGVkX1+f0JquEcszySmsTvVMxxRYcr8eM8bFSxc=', username:'U2FsdGVkX191XwOSr7ERIC09QatsFGPcSBGO87yf3ws=', password:'U2FsdGVkX19iBGR1g8HdSx88DgEf7y9ZeaXVpqmGEB8='},
+        {appname:'U2FsdGVkX19f7FhZxZ+QzaiH/C1lTwMWxbhtAbnDrwzLFzhAbchKrg1WRaVuNLdJ', username:'U2FsdGVkX1+Cu25lGbgQYCHmrkam6ZJbA2miiYvTS1c=', password:'U2FsdGVkX19RjlgnawjM6BybsGnOiaCLJdAgQJ9oPJk='},
+        // K
+        {appname:'U2FsdGVkX1+tmA2/xcL+NoA4seh7CUlp2JSbwFC56pc=', username:'U2FsdGVkX1+9JgJfSHvfPv6N7DBpFV+di3KPoBQTreJdEiZYej4Oj3TTDVN1TdTF', password:'U2FsdGVkX19tmAjaG2gKPFuag3f7CWxYRrWOJzFK+y8='},
+        {appname:'U2FsdGVkX1/Pg+KDYsTsgBClSqIlcO/Va5JMRqvQpF8=', username:'U2FsdGVkX1/Awv+c67Mdt1CqEGR61/e5xNhCGE2hpQI=', password:'U2FsdGVkX1/qHyD2WHh726VH1BW4/pIfn/b3TlOAfn0='},
+        // L
+        {appname:'U2FsdGVkX19rXLjKD2AE0aPGvoFOStDZKusLOSWyXseIeTr4pl18ebwC4OL59EhK', username:'U2FsdGVkX18S/h4ZVCmMRLEhh7cuaCmaBvyFeFGDAfU=', password:'U2FsdGVkX1/31X6ulb3F58t36dCLEy7vJmV3s5Zrta0='},
+        {appname:'U2FsdGVkX1+NExT8efxpd9tiG7ixNLnVnMIDgCdAg+w=', username:'U2FsdGVkX180jbgl1b8QFS3vTxw+BLqiqu3Dv9aaJWw=', password:'U2FsdGVkX18n8zYL2jdzsMq1fLPyxaCxdzo3IAE1sJA='},
+        // M
+        {appname:'U2FsdGVkX1+JGL1A+lXTuTeU4aGvEglSbvDOIWoaFiuqMD4hozVDPh1YY3/xr/Gb', username:'U2FsdGVkX18Qtwvb/QCc5S2pLKV40tUQ9ZR3nqJEnzc=', password:'U2FsdGVkX1++P3Bu/q1lyA5Imnb9oiB7WljH01feO1o='},
+        {appname:'U2FsdGVkX192JEhdNP3leHlAjgLEKHImihjXqlf/m4Q=', username:'U2FsdGVkX18bs8A1hD0eOFD6On2oDfCV0ezhGplUsNodsjG/jVWkYbNBXj/GnMn1', password:'U2FsdGVkX1/r8UrkaDdjoXtTAECqHgxs115P1iEGsaQ='},
+        {appname:'U2FsdGVkX1+OYrHw/4kkLSQAh9iWR5rRH84ECQ5HmMc=', username:'U2FsdGVkX1/DhUsXsD3R6jhiK4/yIJZP0acr1LqYa/NRB+VGckzTtL0H4URSuJwt', password:'U2FsdGVkX18uSrSchgwuASgixr1i6X2MkOVRUGhZtXM='},
+        {appname:'U2FsdGVkX1+dLGbO3tkC2G5cNYM5xdJ3fHmQjmvSNEE=', username:'U2FsdGVkX1+ekSpdRzgHIf8UkFFnGY9L45YGmqm4SRDqc3HwT5LEKhRN9kijDXdn', password:'U2FsdGVkX18kRSye++fCCeCE2BNx3RB3Aocr1Jiko+E='},
+        // N
+        {appname:'U2FsdGVkX19xoAf1cKiIF72YoGiBk5bgqj0XeJXatLg=', username:'U2FsdGVkX18NWIOEzl6rw5Q3Ky7mNDcd6DjMCGescAI=', password:'U2FsdGVkX1/lHCXvXMZOsULE5H0JIzSZYZtUmgU7nt8='},
+        // O
+        {appname:'U2FsdGVkX1+RUB1Yy8i1FHdAv2PJPWLTasMpP7jCaTY=', username:'U2FsdGVkX18SBQcqzk1XPf12PPKRKOcdjL8nG9pco5KrIEWdo4/gMZYqzZeYy50B', password:'U2FsdGVkX19nTQlDLaFWzxEmIxp2Plo7G77sZro9e78='},
+        // P
+        {appname:'U2FsdGVkX19INv8iDKPruX0dnQzq051C9OPoZhBh9KA=', username:'U2FsdGVkX1/PrbWQ2siZn2QT61HIkuspJnyPRpb5j+J8dGg1r6e/T4ubMVQojfsV', password:'U2FsdGVkX1/oOBdLDntbPOO7vO1iXE9tLzkVOLDiNgA='},
+        {appname:'U2FsdGVkX18z0EUFpXm4UgLyE3iUMbfrB+dR62DAg4w=', username:'U2FsdGVkX192f3Nh25APbOGTQXnYx4BK20qtRXYM6VfKKqR5U1FdLD1+mgcowlZp', password:'U2FsdGVkX19QmzvLf9exCiWNyRPQjqMmVXv+n8QAW/4='},
+        // Q
+        {appname:'U2FsdGVkX19XSDN9sGSUMOn6ASX56o2C04C6TkOjfFA=', username:'U2FsdGVkX19wYrOGeLPiGhL6d0wv6ZJbkQxUy406bOY9uRFD3t2NmJw1Mp4Uhbd2', password:'U2FsdGVkX1+rLOlDcnlN+soO+DzG00qyOHoQB2U5zx0='},
+        {appname:'U2FsdGVkX19BMvWg7Gx/TcPFfNmFh6s9eB0yAyqergg=', username:'U2FsdGVkX18hDRHAQkgp67enXt17ePtm7n9y/1xAyx0=', password:'U2FsdGVkX1/9OXqwobK3zmh1ThyLP4aachaoI+VkxuU='},
+        {appname:'U2FsdGVkX18eejRm6TuelmIxNidvCFbJ3L0MnYGaR3eCgfbuRKU0JU49MHbKNrnVa0SYT83UAzIivslS4KXQFw==', username:'U2FsdGVkX1+5RFJk/869faiQRpZAyzdQVkaOymqSrZk=', password:'U2FsdGVkX1+VyS7UEi1d2edPIgrLM5VhbCUK3P2qXZU='},
+        // R
+        {appname:'U2FsdGVkX19eC8WYf8L9FK4nWNISC6JYBUifPMIsgQw=', username:'U2FsdGVkX19nJpy7VD1BJe6YFlYPliTnYjGKILJULqI=', password:'U2FsdGVkX1+7ovwJBZ5dCGOJXuCO1F/B+W3tmNjmC8o='},
+        // S
+        {appname:'U2FsdGVkX1+Dgck7qI4PnFWQcqcBaaoFnEyZV5BIyCs=', username:'U2FsdGVkX1//kmqvw+kG1djgWbrvtjTNtm0lCaFfqcMV0o93mlZiy20TIX4P8aHI', password:'U2FsdGVkX195KJQhIRkALA6Ts8NPI7PUpL4izc1gC6E='},
+        {appname:'U2FsdGVkX18MgGxg7T8nSNfbmIEvLFVYev9Gs/aZDjQ=', username:'U2FsdGVkX1+mSkWaqyjewZ9zdPYAHPK+qTYb3dc+EpM=', password:'U2FsdGVkX182e44GQq4lnzvyxXL0ZXWybJyp2TOCeqY='},
+        {appname:'U2FsdGVkX18pm8JG5DC5HQAcXAgnvVeYIjuuq06s0zo=', username:'U2FsdGVkX1/7tswZggBqbLxaoveFZSG/e8SSEvmsumI=', password:'U2FsdGVkX1/6sU6UvA9FC5SyHJRG5tYyB4yKXLci2uI='},
+        // T
+        {appname:'U2FsdGVkX1+rnkwdJIyqjZt1zuVrWjGM9VhdcHnxBKqJMJOrnJ/cPvf5LVUn0uU1', username:'U2FsdGVkX19Jk3xLOwDCVuAsVU00inXdirVbSr8T6oU=', password:'U2FsdGVkX1/Si61CWw4Sh8l0tUSgmCZrDHJ0xZgbtu0='},
+        {appname:'U2FsdGVkX1/7kjZCEPTsD5XQjUty4G2bP0rB2zDQJIk=', username:'U2FsdGVkX1/8Pr+ovIYxIoDGGxvfC/QOyzM9hX+ZGvq7IRPF+6WaZ3oVD4IazAvb', password:'U2FsdGVkX1+gjaDJR9C2lHPaTlJcD3HllAbPs5mFIq0='},
+        {appname:'U2FsdGVkX1+ubH3k1W8fnGyUVlNXiRLDy1X70wSDjJA=', username:'U2FsdGVkX1+90DeHmR7BclBap9TbjX4yLM/sDrhhvxk=', password:'U2FsdGVkX1+zTUq8e+lKbGFnnlIkiS1wp2DGRiTs8/I='},
+        {appname:'U2FsdGVkX1/3z1SPZH1+2VMZWSFluj+sxAEymQzWMqU=', username:'U2FsdGVkX1+dJFDQj3I3U76AVgC4P0Qf3TNTWl5YKDs=', password:'U2FsdGVkX1+rSfvQ4k54re7qyPQE9scNx99lsRT/754='},
+        {appname:'U2FsdGVkX1/Nqb8fMC4nGCVlH9EjpIxSlHaJoORIg0I=', username:'U2FsdGVkX185Qu7TBbmLx5T0Pxw0v7eXWQeBGwBix9I=', password:'U2FsdGVkX19J/PuKqp5N56T4aP94EEa5nFSykExOYBM='},
+        // U
+        {appname:'U2FsdGVkX1+7x/4kWxlVOCppQKnt1N3CaFE0bifW9zI=', username:'U2FsdGVkX1+qNZWHxtE8diers9qyhyws8ELKmcr2+EU=', password:'U2FsdGVkX1/j/jcLYZHRnrOOvW4NpbMW9bv8hGoM860='},
+        // V
+        // W
+        // X
+        {appname:'U2FsdGVkX19l9mVUbYIOXLha3eOKBiA7MnfxMOhYeiQ=', username:'U2FsdGVkX18B9SEc/TjnRs7XrhGxrO/1iUojs7HUCcI=', password:'U2FsdGVkX18/leW1mFxXN/WXSwFodS10YfR2pQbGzGQ='},
+        {appname:'U2FsdGVkX18xW0LuGwYkkPjb5ApipIQem8pHvnMJH8k=', username:'U2FsdGVkX19dFNnfmjMGNqLNGHGfRkWBXUaftQJ5fvHX772YHRr0DKRsUWzETofn', password:'U2FsdGVkX19LM7lTP2bXQSm5zrMczjD52A6TFTAR0Wc='},
+        {appname:'U2FsdGVkX1+bQblLARZAAtHq/D/IEtq/9VJKDekzZsM=', username:'U2FsdGVkX19jjKWd9okh+goIwsd706H6enViA7ay7MI=', password:'U2FsdGVkX1+QcBbqX1CQbjjVkLBssT1j1sOEKKphuSs='},
+        {appname:'U2FsdGVkX1+Z0xwU1f9lCmtgjS7ciQV1cwduW8d1D+bW8pds7akd51wbR53hA9iI', username:'U2FsdGVkX1/FcISPaXK+wLcFY5ZYeteYcO53xQoBeS5XkQrp7ow/TvRwxir3H4UO', password:'U2FsdGVkX1/r66uVgzz2BxhU1VrPlxM0cFsuCyfnp8g='},
+        // Y
+        {appname:'U2FsdGVkX19FMGp98YoAxaJMZjBD8AGoLj43Jy5VuDA=', username:'U2FsdGVkX1+Po6bQnyELgDanAc01tWstNzaIyeqM8V0=', password:'U2FsdGVkX1/zyzov2QyW+4y/xkAEcd8AP+Z9O4KV+DI='},
+        {appname:'U2FsdGVkX1/pvmmNxjENOoksTbFBKjwuf7taaav009Y=', username:'U2FsdGVkX1/vT/XfQucYzfWDOWHmbP+2xUG2f90WyFU=', password:'U2FsdGVkX1/2hWokhNFEbSj6CQBgnnDR8n1fu1bCnBc='},
+        {appname:'U2FsdGVkX1/P2XCsnJKh07p3k1w1deZspbP2c6yrGFI=', username:'U2FsdGVkX19IhW1VIz5WV5qhFG3QTHqLzVy4jJiCoWY=', password:'U2FsdGVkX18AqZTqTabvjCKVGCAj6kkjX4v73kga3Ys='},
+        // Z
+        {appname:'U2FsdGVkX18anocXoBQVy91/WIbKGrkk8zhvo1PKIfU=', username:'U2FsdGVkX1+DlcVxIHZuUdZBJXUpEf60GMDTOApD6ek=', password:'U2FsdGVkX18YadbDNC8Ks8npvTlgGczfMRgDbtdYH1I='},
+        {appname:'U2FsdGVkX19FwyGE0bOnkcnqCnIiCOF7lYPUpt99xc4=', username:'U2FsdGVkX1+Z0Wppm99vgQcuhlpKECUbNf/4GTfqcH8=', password:'U2FsdGVkX19NZyhe2U7zVrVMgRSmlGItVvAQeZteauA='},
+        {appname:'U2FsdGVkX1/XD5oGvqKfVeVfTOA3VdQb3TCEzHCJz2YdqBjakBgm2s2pK1JF48plhqmicIbp549K8NXwTsRkT5s5PBFu+C9g1swM0lMItMY=', username:'U2FsdGVkX18bANdGCVtku444VgfBy9EfLBteassr9sw=', password:'U2FsdGVkX1+kMiApD1vO7DY3C+qk9HRwS/kQQ5TdWNJdXazhAls8pelspL9VA0Iy'},
+        //
+        {appname:'U2FsdGVkX19vpXohTqvfCPR+vMriB/0E+4rouKsvAqU=', username:'U2FsdGVkX1/kSO2BFWYLRsmPFx9tKOEHIZ9E5k+f9tI=', password:'U2FsdGVkX19hqybOMrzNqFnlJC1JWooqQwA5D7kOGs0='}
+    ]
+
+    let decryptedPswdData = [];
+    var t;
+    for (i of encryptedPswdData) {
+        t = {
+            appname: CryptoJS.AES.decrypt(i.appname, window.pswd).toString(CryptoJS.enc.Utf8),
+            username: CryptoJS.AES.decrypt(i.username, window.pswd).toString(CryptoJS.enc.Utf8),
+            password: CryptoJS.AES.decrypt(i.password, window.pswd).toString(CryptoJS.enc.Utf8)
+        }
+        decryptedPswdData.push(t)
+    }
+
+    //=========================以下log方法为记录加密数据用，日常注释掉=============================================
+    // console.log(
+    //     '{appname:\'' + CryptoJS.AES.encrypt('~appname~', window.pswd).toString() +
+    //     '\', username:\'' + CryptoJS.AES.encrypt('~username~', window.pswd).toString() +
+    //     '\', password:\'' + CryptoJS.AES.encrypt('~password~', window.pswd).toString() + '\'}'
+    // )
+    //===========将数据填入带~**~符号数据中，从页面控制台获取log，硬编码入上面encryptedPswdData中======================
+
+    for (const pswdInfo of decryptedPswdData) {
+        var pswdhtml = `
+                    <div class="highlight-tools" >
+                        <i class="fas fa-angle-down expand" onclick="handleClick(this)"></i>
+                        <div class="code-lang">${pswdInfo.appname}</div>
+                        <div class="copy-notice">复制成功</div>
+                        <i class="fas fa-paste copy-button" onclick="copyClick(this)"></i>
+                    </div>
+                    <table style="display: none;">
+                        <tbody>
+                            <tr>
+                                <td class="gutter"><pre><span class="line">${pswdInfo.username}</span><br></pre></td>
+                                <td class="code"><pre><span class="line">${pswdInfo.password}</span><br></pre></td>
+                            </tr>
+                        </tbody>
+                    </table>
+            `
+
+        const figure = document.createElement('figure');
+        figure.innerHTML = pswdhtml;
+        figure.classList.add('highlight');
+        figure.classList.add('shell');
+        const article = document.getElementById('article-container');
+        article.appendChild(figure);
+    }
+</script>
+
+</html>
