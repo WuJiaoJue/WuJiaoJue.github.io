@@ -317,7 +317,7 @@
                 try {
                     hasdedPass1 = CryptoJS.SHA256(pass1.slice(0, 9) + salt).toString()
                 } catch (e) {
-                    pass1 = '';
+                    pass1 = '1';
                 }
                 if (!pass1)
                     history.go(-1);
