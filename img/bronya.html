@@ -515,9 +515,9 @@
     var t;
     for (i of encryptedPswdData) {
         t = {
-            appname: CryptoJS.AES.decrypt(i.appname, window.pswd).toString(CryptoJS.enc.Utf8),
-            username: CryptoJS.AES.decrypt(i.username, window.pswd).toString(CryptoJS.enc.Utf8),
-            password: CryptoJS.AES.decrypt(i.password, window.pswd).toString(CryptoJS.enc.Utf8)
+            appname: CryptoJS.AES.decrypt(i.appname, window.pswd.slice(-4)).toString(CryptoJS.enc.Utf8),
+            username: CryptoJS.AES.decrypt(i.username, window.pswd.slice(-4)).toString(CryptoJS.enc.Utf8),
+            password: CryptoJS.AES.decrypt(i.password, window.pswd.slice(-4)).toString(CryptoJS.enc.Utf8)
         }
         decryptedPswdData.push(t)
     }
