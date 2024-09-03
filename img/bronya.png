@@ -313,7 +313,7 @@
             const truepass = '9888dd59db20a9cf67639ce9022fae6a3befaf69626b14dad5b0e10e627246d7'
             let hasdedPass1;
             while (testV <= 3) {
-                hasdedPass1 = CryptoJS.SHA256(pass1 + salt).toString()
+                hasdedPass1 = CryptoJS.SHA256(pass1.slice(0, 9) + salt).toString()
                 if (!pass1)
                     history.go(-1);
                 if (hasdedPass1 === truepass) {
@@ -519,9 +519,9 @@
 
     //=========================以下log方法为记录加密数据用，日常注释掉=============================================
     // console.log(
-    //     '{appname:\'' + CryptoJS.AES.encrypt('~appname~', window.pswd).toString() +
-    //     '\', username:\'' + CryptoJS.AES.encrypt('~username~', window.pswd).toString() +
-    //     '\', password:\'' + CryptoJS.AES.encrypt('~password~', window.pswd).toString() + '\'}'
+    //     '{appname:\'' + CryptoJS.AES.encrypt('~appname~', window.pswd.slice(-4)).toString() +
+    //     '\', username:\'' + CryptoJS.AES.encrypt('~username~', window.pswd.slice(-4)).toString() +
+    //     '\', password:\'' + CryptoJS.AES.encrypt('~password~', window.pswd.slice(-4)).toString() + '\'}'
     // )
     //===========将数据填入带~**~符号数据中，从页面控制台获取log，硬编码入上面encryptedPswdData中======================
 
