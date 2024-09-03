@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.18.2/dist/index.js"></script>
 
     <style>
         #body-wrap,#content-inner {
@@ -517,6 +518,8 @@
         decryptedPswdData.push(t)
     }
 
+    decryptedPswdData = decryptedPswdData.sort(sortItems);
+
     //=========================以下log方法为记录加密数据用，日常注释掉=============================================
     // console.log(
     //     '{appname:\'' + CryptoJS.AES.encrypt('~appname~', window.pswd.slice(-4)).toString() +
@@ -549,6 +552,35 @@
         figure.classList.add('shell');
         const article = document.getElementById('article-container');
         article.appendChild(figure);
+    }
+
+    // 根据拼音首字母排序的函数
+    function getPinyinInitial(name) {
+        return pinyinPro.pinyin(name);
+    }
+
+    function sortItems(a, b) {
+        const getCategory = (str) => {
+            if (str === null || str === undefined || str === '') return 9999; // 空字符串排最后
+            if (/^\d/.test(str)) return 0; // 数字
+            if (/^[a-zA-Z]/.test(str)) return 1; // 字母
+            return 2; // 汉字
+        };
+
+        const categoryA = getCategory(a.appname);
+        const categoryB = getCategory(b.appname);
+
+        if (categoryA !== categoryB) {
+            return categoryA - categoryB;
+        }
+
+        if (categoryA === 2) { // 汉字
+            const aInitial = getPinyinInitial(a.appname);
+            const bInitial = getPinyinInitial(b.appname);
+            return aInitial.localeCompare(bInitial);
+        } else { // 数字或字母
+            return a.appname.localeCompare(b.appname);
+        }
     }
 </script>
 
