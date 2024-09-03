@@ -310,7 +310,7 @@
                 '（ᗜ ‸ ᗜ）';
             const salt = 'bronya';
             let pass1 = prompt(imgtext,'');
-            const truepass = '45f9667b18c9e7e57f60f6ed9b75b8701f287008fc1a8d3ac4bf253ca81eb5d0'
+            const truepass = 'truepass'
             let hasdedPass1;
             while (testV <= 3) {
                 hasdedPass1 = CryptoJS.SHA256(pass1 + salt).toString()
